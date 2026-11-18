@@ -1,0 +1,3 @@
+id,title,description,owner,status,validate_by,linked_risk
+A-001,Foundry PDK 1.2 arrives by 2026-02-15,,Avery Chen,validated,2026-02-15,
+A-002,Customer firmware team is ready before tape-out,,Avery Chen,untested,2026-08-01,R-003

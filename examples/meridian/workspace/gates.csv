@@ -1,0 +1,10 @@
+id,name,phase,type,baseline_date,planned_date,actual_date,state,criteria_met,waiver_refs,triggered_by
+G1,Concept Approval,concept,planned,2026-01-30,2026-01-30,2026-01-30,GO,1;2;3,,
+G2,Requirements Freeze,requirements,planned,2026-02-27,2026-02-27,2026-02-27,GO,1;2;3,,
+G3,Plan of Record Baseline,planning,planned,2026-03-20,2026-03-20,2026-03-20,GO,1;2;3;4,,
+G4,Design Freeze,design,planned,2026-06-12,2026-06-26,2026-06-26,GO,1;2;3,,
+G5,Tape-Out Readiness Review,verification,planned,2026-08-07,2026-08-21,,PLANNED,,,
+G6,Tape-Out Sign-off,tapeout,planned,2026-09-04,2026-09-18,,PLANNED,,,
+G7,Power-On Success,bringup,planned,2026-10-16,2026-10-30,,PLANNED,,,
+G8,Qualification Exit,testing,planned,2026-12-04,2026-12-18,,PLANNED,,,
+G9,Production Release,production,planned,2026-12-18,2027-01-01,,PLANNED,,,

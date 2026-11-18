@@ -1,0 +1,389 @@
+{
+  "_doc": "Profile = every number and name the framework needs. Keys starting with _ are comments. Defaults come from the playbook modules; change them to fit your program (see docs/ADAPTING.md).",
+  "profile_id": "software",
+  "name": "Software platform program, 6 phases",
+  "schema_version": "1.0",
+  "description": "Second example to show the core is domain-agnostic: an internal or customer-facing software platform delivery with a feature freeze and a go-live. Same lifecycles, severity model and metrics; different phases and gates.",
+  "parties": [
+    {
+      "id": "customer",
+      "label": "Customer"
+    },
+    {
+      "id": "delivery",
+      "label": "Delivery org"
+    },
+    {
+      "id": "third_party",
+      "label": "3rd-party dependencies"
+    },
+    {
+      "id": "pm",
+      "label": "PM"
+    }
+  ],
+  "phases": [
+    {
+      "id": "discovery",
+      "name": "Discovery",
+      "generic_phase": "Pre-Sales / Feasibility",
+      "raci": {
+        "customer": "R",
+        "delivery": "C",
+        "third_party": "C",
+        "pm": "A"
+      }
+    },
+    {
+      "id": "planning",
+      "name": "Planning",
+      "generic_phase": "Award / Contract / Kickoff",
+      "raci": {
+        "customer": "A",
+        "delivery": "R",
+        "third_party": "R",
+        "pm": "A"
+      }
+    },
+    {
+      "id": "build",
+      "name": "Build",
+      "generic_phase": "Design / Build",
+      "raci": {
+        "customer": "C",
+        "delivery": "R",
+        "third_party": "R",
+        "pm": "A"
+      }
+    },
+    {
+      "id": "integration",
+      "name": "Integration & Test",
+      "generic_phase": "Integration / Hardening",
+      "raci": {
+        "customer": "I",
+        "delivery": "R",
+        "third_party": "C",
+        "pm": "A"
+      }
+    },
+    {
+      "id": "release",
+      "name": "Release",
+      "generic_phase": "Release / Go-live",
+      "raci": {
+        "customer": "A",
+        "delivery": "R",
+        "third_party": "C",
+        "pm": "A"
+      }
+    },
+    {
+      "id": "operate",
+      "name": "Operate",
+      "generic_phase": "Sustain / Production",
+      "raci": {
+        "customer": "I",
+        "delivery": "R",
+        "third_party": "C",
+        "pm": "A"
+      }
+    }
+  ],
+  "gates": [
+    {
+      "id": "G1",
+      "name": "Charter Approval",
+      "phase": "discovery",
+      "type": "planned",
+      "exit_criteria": [
+        "Problem and success measures written down",
+        "Sponsor named",
+        "Rough cost and timeline reviewed"
+      ]
+    },
+    {
+      "id": "G2",
+      "name": "Plan Baseline",
+      "phase": "planning",
+      "type": "planned",
+      "exit_criteria": [
+        "Scope and acceptance criteria signed",
+        "RACI published and acknowledged",
+        "Schedule and budget baselines approved",
+        "Environments and access provisioned"
+      ]
+    },
+    {
+      "id": "G3",
+      "name": "Feature Freeze",
+      "phase": "build",
+      "type": "planned",
+      "requires_no_open_severity": [
+        1,
+        2
+      ],
+      "exit_criteria": [
+        "Planned scope code-complete",
+        "No open Sev 1 or Sev 2 issues",
+        "Test coverage target met"
+      ]
+    },
+    {
+      "id": "G4",
+      "name": "Release Readiness",
+      "phase": "integration",
+      "type": "planned",
+      "requires_no_open_severity": [
+        1,
+        2
+      ],
+      "exit_criteria": [
+        "Integration and performance tests passed",
+        "Security review complete or waived in writing",
+        "Rollback plan rehearsed"
+      ]
+    },
+    {
+      "id": "G5",
+      "name": "Go-Live",
+      "phase": "release",
+      "type": "planned",
+      "requires_no_open_severity": [
+        1
+      ],
+      "exit_criteria": [
+        "Acceptance criteria met",
+        "Waivers documented and signed",
+        "Operations on-call briefed"
+      ]
+    },
+    {
+      "id": "G6",
+      "name": "Operate Handoff",
+      "phase": "operate",
+      "type": "planned",
+      "exit_criteria": [
+        "Metrics stable at target",
+        "Runbooks handed off",
+        "Lessons learned captured"
+      ]
+    }
+  ],
+  "severity": {
+    "brief_required_for": [
+      1,
+      2
+    ],
+    "exec_notice_same_day": [
+      1
+    ],
+    "levels": [
+      {
+        "level": 1,
+        "label": "Sev 1",
+        "color": "red",
+        "trigger": "Blocks release, forces a re-spin, or is a customer-visible outage",
+        "cadence": "Same-day exec notification; daily war-room update until resolved",
+        "aging_days": {
+          "green_max": 7,
+          "amber_max": 14
+        }
+      },
+      {
+        "level": 2,
+        "label": "Sev 2",
+        "color": "amber",
+        "trigger": "More than 1 week of slip, or a scope or contract change is required",
+        "cadence": "Weekly exec visibility",
+        "aging_days": {
+          "green_max": 14,
+          "amber_max": 28
+        }
+      },
+      {
+        "level": 3,
+        "label": "Sev 3",
+        "color": "yellow",
+        "trigger": "Less than 1 week of impact, manageable inside the team",
+        "cadence": "Weekly triage",
+        "aging_days": null
+      },
+      {
+        "level": 4,
+        "label": "Sev 4",
+        "color": "green",
+        "trigger": "Logged risk, no current impact",
+        "cadence": "Monthly review",
+        "aging_days": null
+      }
+    ]
+  },
+  "escalation": {
+    "_doc": "An issue or risk in an open state for more than this many days (since raised/detected) is flagged Escalated. Computed, never typed.",
+    "open_states_issue": [
+      "DETECTED",
+      "LOGGED",
+      "TRIAGED",
+      "DECIDED"
+    ],
+    "days": 14
+  },
+  "risk": {
+    "scale": {
+      "min": 1,
+      "max": 5
+    },
+    "probability": {
+      "1": "Rare",
+      "2": "Unlikely",
+      "3": "Possible",
+      "4": "Likely",
+      "5": "Near-certain"
+    },
+    "impact": {
+      "1": "Negligible",
+      "2": "Minor",
+      "3": "Moderate",
+      "4": "Major",
+      "5": "Severe"
+    },
+    "bands": [
+      {
+        "min": 15,
+        "max": 25,
+        "priority": "Critical",
+        "review_days": 7,
+        "action": "Weekly PM-owned mitigation plan; in every weekly RAID review"
+      },
+      {
+        "min": 8,
+        "max": 14,
+        "priority": "High",
+        "review_days": 14,
+        "action": "Mitigation plan exists; reviewed bi-weekly"
+      },
+      {
+        "min": 4,
+        "max": 7,
+        "priority": "Medium",
+        "review_days": 30,
+        "action": "Logged and monitored monthly"
+      },
+      {
+        "min": 1,
+        "max": 3,
+        "priority": "Low",
+        "review_days": 90,
+        "action": "Logged; revisited quarterly or on plan change"
+      }
+    ]
+  },
+  "metrics": {
+    "_doc": "Module 08 defaults. Workstream status = worst of the five colors, never an average.",
+    "schedule_variance": {
+      "green_max_pct": 3,
+      "amber_max_pct": 8,
+      "overdue_gate_is_red": true
+    },
+    "gate_on_time": {
+      "green_min_pct": 90,
+      "amber_min_pct": 75
+    },
+    "issue_aging": {
+      "source": "severity.levels[].aging_days"
+    },
+    "escape_rate": {
+      "green_max_pct": 10,
+      "amber_max_pct": 20,
+      "min_issues_for_rating": 3
+    },
+    "burn_ratio": {
+      "green": [
+        0.9,
+        1.1
+      ],
+      "amber_high": 1.25,
+      "red_if_forecast_over_budget": true,
+      "under_spend_amber_below": 0.9,
+      "_note": "Module 08 lists Amber as 1.1-1.25 or below 0.75 and leaves 0.75-0.9 undefined. Build default: any ratio below the green band is Amber (under-spend can mean under-resourced), never Red."
+    }
+  },
+  "change_control": {
+    "escalate_cumulative_pct": 10,
+    "tiers": [
+      {
+        "id": "small",
+        "label": "Small",
+        "max_cost": 2500,
+        "max_days": 1,
+        "approvers": [
+          "pm"
+        ],
+        "turnaround": "Same day"
+      },
+      {
+        "id": "medium",
+        "label": "Medium",
+        "max_cost": 25000,
+        "max_days": 5,
+        "approvers": [
+          "pm",
+          "delivery_lead"
+        ],
+        "turnaround": "2 business days"
+      },
+      {
+        "id": "large",
+        "label": "Large",
+        "max_cost": 100000,
+        "max_days": 20,
+        "approvers": [
+          "sponsor",
+          "customer"
+        ],
+        "turnaround": "1 week"
+      },
+      {
+        "id": "major",
+        "label": "Major",
+        "max_cost": null,
+        "max_days": null,
+        "approvers": [
+          "sponsor",
+          "customer",
+          "change_control_board"
+        ],
+        "turnaround": "Scheduled review cycle"
+      }
+    ],
+    "_tier_rule": "A change takes the highest tier reached by either its cost or its schedule impact."
+  },
+  "cadence": [
+    {
+      "id": "daily",
+      "audience": "Delivery team",
+      "when": "Active build and any open Sev 1"
+    },
+    {
+      "id": "weekly",
+      "audience": "Program team and sponsor",
+      "when": "Every week the program is active"
+    },
+    {
+      "id": "biweekly",
+      "audience": "Customer",
+      "when": "Per contract"
+    },
+    {
+      "id": "monthly",
+      "audience": "Management",
+      "when": "Monthly review"
+    },
+    {
+      "id": "quarterly",
+      "audience": "Executive",
+      "when": "Quarterly review"
+    }
+  ]
+}

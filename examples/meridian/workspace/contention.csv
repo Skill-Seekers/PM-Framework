@@ -1,0 +1,3 @@
+resource,period,program,demand,capacity,owner,note
+Emulation cluster,2026-06,Meridian,6,10,Sam Okafor,
+Emulation cluster,2026-06,Atlas,5,10,Sam Okafor,another fictional program

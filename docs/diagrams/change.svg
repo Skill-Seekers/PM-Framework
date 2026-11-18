@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1348 374" width="1348" height="374" role="img" aria-labelledby="t-change d-change">
+<title id="t-change">Change lifecycle</title>
+<desc id="d-change">Change lifecycle. States: REQUESTED, ASSESSED, APPROVED, REJECTED, DEFERRED, IMPLEMENTED, VERIFIED. Transitions: change assess (REQUESTED to ASSESSED); change approve (ASSESSED to APPROVED); change reject (ASSESSED to REJECTED); change defer (ASSESSED to DEFERRED); change implement (APPROVED to IMPLEMENTED); change verify (IMPLEMENTED to VERIFIED).</desc>
+<style>
+  .bg { fill: #ffffff; }
+  .box { fill: #f6f8fa; stroke: #57606a; stroke-width: 1.5; }
+  .initial .box { stroke: #0b5cad; stroke-width: 3; fill: #eaf2fb; }
+  .terminal .box { fill: #e1e6eb; stroke: #57606a; stroke-width: 1.5; }
+  .state text { fill: #1f2328; font: 600 13px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .edge { fill: none; stroke: #3d4650; stroke-width: 1.8; }
+  .edge.back { stroke-dasharray: 7 5; }
+  .tip { fill: #3d4650; }
+  .lbl rect { fill: #ffffff; stroke: #8c959f; stroke-width: 1; }
+  .lbl text { fill: #1f2328; font: 500 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .lbl.back rect { fill: #fff8e6; }
+  .group { fill: none; stroke: #8c959f; stroke-width: 1.5; stroke-dasharray: 3 4; }
+  .grouplbl { fill: #57606a; font: 500 11px system-ui, sans-serif; }
+  .title { fill: #1f2328; font: 700 16px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .legend { fill: #57606a; font: 500 11.5px system-ui, sans-serif; }
+  @media (prefers-color-scheme: dark) {
+    .bg { fill: #0d1117; }
+    .box { fill: #161b22; stroke: #8b949e; }
+    .initial .box { stroke: #58a6ff; fill: #12233a; }
+    .terminal .box { fill: #21262d; stroke: #8b949e; }
+    .state text { fill: #e6edf3; }
+    .edge { stroke: #b6bec8; }
+    .tip { fill: #b6bec8; }
+    .lbl rect { fill: #0d1117; stroke: #6e7681; }
+    .lbl text { fill: #e6edf3; }
+    .lbl.back rect { fill: #2a2110; }
+    .group { stroke: #6e7681; }
+    .grouplbl, .legend { fill: #9da7b3; }
+    .title { fill: #e6edf3; }
+  }
+</style>
+<defs><marker id="ah-change" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="tip" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+<rect class="bg" x="0" y="0" width="1348" height="374"/>
+<text class="title" x="56" y="34">Change lifecycle</text>
+<text class="legend" x="56" y="356">Blue outline = starts here. Grey fill = end state. Solid arrow = forward step. Dashed arrow = loop back. Hover an arrow for its guards.</text>
+<g><title>change approve: ASSESSED -&gt; APPROVED
+guards: all_tier_approvers_signed, decision_ref_present</title><path class="edge" d="M488,121 L592,121" marker-end="url(#ah-change)"/><g class="lbl"><rect x="508.5" y="111" width="63" height="20" rx="10"/><text x="540" y="125" text-anchor="middle">approve</text></g></g>
+<g><title>change assess: REQUESTED -&gt; ASSESSED
+guards: sizing_present</title><path class="edge" d="M220,121 L324,121" marker-end="url(#ah-change)"/><g class="lbl"><rect x="244" y="111" width="56" height="20" rx="10"/><text x="272" y="125" text-anchor="middle">assess</text></g></g>
+<g><title>change defer: ASSESSED -&gt; DEFERRED
+guards: reason_present</title><path class="edge" d="M406,146 L406,228" marker-end="url(#ah-change)"/><g class="lbl"><rect x="381.5" y="177" width="49" height="20" rx="10"/><text x="406" y="191" text-anchor="middle">defer</text></g></g>
+<g><title>change implement: APPROVED -&gt; IMPLEMENTED
+guards: budget_row_logged</title><path class="edge" d="M756,121 L860,121" marker-end="url(#ah-change)"/><g class="lbl"><rect x="769.5" y="111" width="77" height="20" rx="10"/><text x="808" y="125" text-anchor="middle">implement</text></g></g>
+<g><title>change reject: ASSESSED -&gt; REJECTED
+guards: reason_present</title><path class="edge" d="M406,146 L674,228" marker-end="url(#ah-change)"/><g class="lbl"><rect x="512" y="177" width="56" height="20" rx="10"/><text x="540" y="191" text-anchor="middle">reject</text></g></g>
+<g><title>change verify: IMPLEMENTED -&gt; VERIFIED
+guards: verification_ref_present</title><path class="edge" d="M1024,121 L1128,121" marker-end="url(#ah-change)"/><g class="lbl"><rect x="1048" y="111" width="56" height="20" rx="10"/><text x="1076" y="125" text-anchor="middle">verify</text></g></g>
+<g class="state initial"><rect class="box" x="56" y="96" width="164" height="50" rx="10"/><text x="138" y="125.5" text-anchor="middle">REQUESTED</text></g>
+<g class="state"><rect class="box" x="324" y="96" width="164" height="50" rx="10"/><text x="406" y="125.5" text-anchor="middle">ASSESSED</text></g>
+<g class="state"><rect class="box" x="592" y="96" width="164" height="50" rx="10"/><text x="674" y="125.5" text-anchor="middle">APPROVED</text></g>
+<g class="state terminal"><rect class="box" x="592" y="228" width="164" height="50" rx="10"/><text x="674" y="257.5" text-anchor="middle">REJECTED</text></g>
+<g class="state terminal"><rect class="box" x="324" y="228" width="164" height="50" rx="10"/><text x="406" y="257.5" text-anchor="middle">DEFERRED</text></g>
+<g class="state"><rect class="box" x="860" y="96" width="164" height="50" rx="10"/><text x="942" y="125.5" text-anchor="middle">IMPLEMENTED</text></g>
+<g class="state terminal"><rect class="box" x="1128" y="96" width="164" height="50" rx="10"/><text x="1210" y="125.5" text-anchor="middle">VERIFIED</text></g>
+</svg>

@@ -1,0 +1,3 @@
+id,title,description,owner,provider,needed_by,status,linked_issue
+D-001,Foundry PDK 1.2,,Jordan Patel,Fabrica Foundry,2026-02-15,delivered,
+D-002,Customer firmware drop,,Avery Chen,Northwind Systems,2026-09-01,open,

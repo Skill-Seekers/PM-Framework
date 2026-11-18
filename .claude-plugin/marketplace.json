@@ -1,0 +1,11 @@
+{
+  "name": "pm-framework",
+  "owner": { "name": "Skill-Seekers" },
+  "plugins": [
+    {
+      "name": "pm-framework",
+      "source": "./",
+      "description": "Guarded program-management workflow: registers, lifecycles, gate reviews, health metrics and a dashboard, driven by five skills."
+    }
+  ]
+}

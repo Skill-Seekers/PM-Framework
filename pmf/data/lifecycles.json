@@ -1,0 +1,437 @@
+{
+  "_doc": "The four lifecycles, defined once. The CLI enforces them, docs/LIFECYCLES.md and the diagrams are generated from this file, and tests check that every state and guard named in the docs exists here. Guards are named checks implemented in pmf/guards.py; a transition is refused when any guard fails.",
+  "schema_version": "1.0",
+  "entities": {
+    "issue": {
+      "register": "issues.csv",
+      "initial": "DETECTED",
+      "states": {
+        "DETECTED": {
+          "step": 1,
+          "meaning": "Found at a gate, review or in the field. Not yet fully described."
+        },
+        "LOGGED": {
+          "step": 2,
+          "meaning": "In the register with one owner and a severity. Same day as detection."
+        },
+        "TRIAGED": {
+          "step": 3,
+          "meaning": "A decision record holds three options and a recommendation."
+        },
+        "DECIDED": {
+          "step": 4,
+          "meaning": "An option was chosen and recorded (signed for waive and defer)."
+        },
+        "RESOLVED": {
+          "step": 4,
+          "meaning": "The chosen option was carried out and verified, or the waiver conditions are in place."
+        },
+        "CLOSED": {
+          "step": 5,
+          "meaning": "Management briefed (Sev 1 and 2) and a lesson captured."
+        },
+        "DEFERRED": {
+          "step": 4,
+          "meaning": "Option C chosen: carried as a known issue into a later release."
+        }
+      },
+      "terminal": [
+        "CLOSED"
+      ],
+      "transitions": [
+        {
+          "from": "DETECTED",
+          "to": "LOGGED",
+          "command": "issue log",
+          "guards": [
+            "has_required_fields",
+            "single_owner",
+            "valid_severity",
+            "valid_phase"
+          ]
+        },
+        {
+          "from": "LOGGED",
+          "to": "TRIAGED",
+          "command": "issue triage",
+          "guards": [
+            "decision_record_has_three_options",
+            "decision_record_has_recommendation"
+          ]
+        },
+        {
+          "from": "TRIAGED",
+          "to": "DECIDED",
+          "command": "issue decide",
+          "guards": [
+            "decision_chosen",
+            "decision_signed_if_waive_or_defer"
+          ]
+        },
+        {
+          "from": "DECIDED",
+          "to": "RESOLVED",
+          "command": "issue resolve",
+          "guards": [
+            "option_is_fix_or_waive",
+            "verification_ref_present"
+          ]
+        },
+        {
+          "from": "DECIDED",
+          "to": "DEFERRED",
+          "command": "issue defer",
+          "guards": [
+            "option_is_defer",
+            "customer_acceptance_if_customer_visible"
+          ]
+        },
+        {
+          "from": "RESOLVED",
+          "to": "CLOSED",
+          "command": "issue close",
+          "guards": [
+            "brief_present_if_required",
+            "lesson_present"
+          ]
+        },
+        {
+          "from": "DEFERRED",
+          "to": "TRIAGED",
+          "command": "issue retriage",
+          "guards": [
+            "reason_present"
+          ]
+        },
+        {
+          "from": "CLOSED",
+          "to": "TRIAGED",
+          "command": "issue reopen",
+          "guards": [
+            "reason_present"
+          ]
+        }
+      ],
+      "rules": [
+        "Aging clock starts on the detected date, whatever state the issue is in.",
+        "Escalated is computed: an issue in an open state for more than escalation.days is flagged.",
+        "A Sev 1 or Sev 2 must appear in the current RAID snapshot (pmf raid).",
+        "Changing severity is an event on the same state, not a transition; it is logged with a reason."
+      ]
+    },
+    "risk": {
+      "register": "risks.csv",
+      "initial": "IDENTIFIED",
+      "states": {
+        "IDENTIFIED": {
+          "meaning": "Logged. Not yet scored."
+        },
+        "ASSESSED": {
+          "meaning": "Probability and impact scored (1 to 5 each); priority band known."
+        },
+        "MITIGATING": {
+          "meaning": "An owner is running a mitigation plan."
+        },
+        "ACCEPTED": {
+          "meaning": "A named approver accepted the exposure in writing."
+        },
+        "OCCURRED": {
+          "meaning": "The triggering event happened. A linked issue was created."
+        },
+        "RETIRED": {
+          "meaning": "No longer a threat (event passed or mitigated away)."
+        }
+      },
+      "terminal": [
+        "OCCURRED",
+        "RETIRED"
+      ],
+      "transitions": [
+        {
+          "from": "IDENTIFIED",
+          "to": "ASSESSED",
+          "command": "risk assess",
+          "guards": [
+            "single_owner",
+            "valid_probability",
+            "valid_impact"
+          ]
+        },
+        {
+          "from": "ASSESSED",
+          "to": "MITIGATING",
+          "command": "risk mitigate",
+          "guards": [
+            "mitigation_present"
+          ]
+        },
+        {
+          "from": "ASSESSED",
+          "to": "ACCEPTED",
+          "command": "risk accept",
+          "guards": [
+            "acceptor_named"
+          ]
+        },
+        {
+          "from": "ASSESSED",
+          "to": "OCCURRED",
+          "command": "risk occur",
+          "guards": [
+            "linked_issue_exists"
+          ]
+        },
+        {
+          "from": "MITIGATING",
+          "to": "OCCURRED",
+          "command": "risk occur",
+          "guards": [
+            "linked_issue_exists"
+          ]
+        },
+        {
+          "from": "ACCEPTED",
+          "to": "OCCURRED",
+          "command": "risk occur",
+          "guards": [
+            "linked_issue_exists"
+          ]
+        },
+        {
+          "from": "MITIGATING",
+          "to": "RETIRED",
+          "command": "risk retire",
+          "guards": [
+            "reason_present"
+          ]
+        },
+        {
+          "from": "ACCEPTED",
+          "to": "RETIRED",
+          "command": "risk retire",
+          "guards": [
+            "reason_present"
+          ]
+        },
+        {
+          "from": "ASSESSED",
+          "to": "RETIRED",
+          "command": "risk retire",
+          "guards": [
+            "reason_present"
+          ]
+        }
+      ],
+      "rules": [
+        "Risk score = probability x impact (1 to 25); the profile maps the score to a priority band and a review interval.",
+        "Re-scoring is an event on the same state. A risk not re-scored within its band's review interval is flagged stale.",
+        "A Critical or High risk cannot be ACCEPTED without a named approver and a note."
+      ]
+    },
+    "change": {
+      "register": "changes.csv",
+      "initial": "REQUESTED",
+      "states": {
+        "REQUESTED": {
+          "meaning": "Asked for, logged as a candidate ECR. No work committed."
+        },
+        "ASSESSED": {
+          "meaning": "Effort, cost, schedule and risk sized; tier computed."
+        },
+        "APPROVED": {
+          "meaning": "Every approver required by the tier signed. Work may start."
+        },
+        "REJECTED": {
+          "meaning": "Declined, with a rationale."
+        },
+        "DEFERRED": {
+          "meaning": "Accepted but moved to a later release."
+        },
+        "IMPLEMENTED": {
+          "meaning": "Work done; budget row and baseline updated."
+        },
+        "VERIFIED": {
+          "meaning": "Result checked against the change request."
+        }
+      },
+      "terminal": [
+        "REJECTED",
+        "DEFERRED",
+        "VERIFIED"
+      ],
+      "transitions": [
+        {
+          "from": "REQUESTED",
+          "to": "ASSESSED",
+          "command": "change assess",
+          "guards": [
+            "sizing_present"
+          ]
+        },
+        {
+          "from": "ASSESSED",
+          "to": "APPROVED",
+          "command": "change approve",
+          "guards": [
+            "all_tier_approvers_signed",
+            "decision_ref_present"
+          ]
+        },
+        {
+          "from": "ASSESSED",
+          "to": "REJECTED",
+          "command": "change reject",
+          "guards": [
+            "reason_present"
+          ]
+        },
+        {
+          "from": "ASSESSED",
+          "to": "DEFERRED",
+          "command": "change defer",
+          "guards": [
+            "reason_present"
+          ]
+        },
+        {
+          "from": "APPROVED",
+          "to": "IMPLEMENTED",
+          "command": "change implement",
+          "guards": [
+            "budget_row_logged"
+          ]
+        },
+        {
+          "from": "IMPLEMENTED",
+          "to": "VERIFIED",
+          "command": "change verify",
+          "guards": [
+            "verification_ref_present"
+          ]
+        }
+      ],
+      "rules": [
+        "No cost or schedule is committed before APPROVED. Work that starts earlier is a process failure, logged as an issue.",
+        "Tier = the highest of the cost tier and the schedule tier; the profile lists the approvers per tier.",
+        "When cumulative approved cost passes change_control.escalate_cumulative_pct of the baseline budget, pmf check warns that a formal re-baseline is due."
+      ]
+    },
+    "gate": {
+      "register": "gates.csv",
+      "initial": "PLANNED",
+      "states": {
+        "PLANNED": {
+          "meaning": "On the calendar with exit criteria."
+        },
+        "REVIEW": {
+          "meaning": "Review meeting held or in progress."
+        },
+        "GO": {
+          "meaning": "All exit criteria met."
+        },
+        "CONDITIONAL_GO": {
+          "meaning": "Proceed; every unmet criterion has a signed waiver."
+        },
+        "NO_GO": {
+          "meaning": "Do not proceed. An issue was logged for each unmet criterion."
+        }
+      },
+      "terminal": [
+        "GO",
+        "CONDITIONAL_GO"
+      ],
+      "transitions": [
+        {
+          "from": "PLANNED",
+          "to": "REVIEW",
+          "command": "gate review",
+          "guards": [
+            "exit_criteria_listed"
+          ]
+        },
+        {
+          "from": "REVIEW",
+          "to": "GO",
+          "command": "gate go",
+          "guards": [
+            "all_criteria_met",
+            "no_blocking_open_issues"
+          ]
+        },
+        {
+          "from": "REVIEW",
+          "to": "CONDITIONAL_GO",
+          "command": "gate conditional",
+          "guards": [
+            "waiver_for_each_unmet_criterion",
+            "no_blocking_open_issues"
+          ]
+        },
+        {
+          "from": "REVIEW",
+          "to": "NO_GO",
+          "command": "gate nogo",
+          "guards": [
+            "issue_logged_for_each_unmet_criterion"
+          ]
+        },
+        {
+          "from": "NO_GO",
+          "to": "REVIEW",
+          "command": "gate review",
+          "guards": [
+            "reason_present"
+          ]
+        }
+      ],
+      "rules": [
+        "Planned gates and issue-triggered gates are listed apart; status reports never mix them.",
+        "A gate may be added after kickoff only as type issue-triggered, with the issue that caused it.",
+        "Gate on-time rate counts completed planned gates whose actual date is on or before the baseline date."
+      ]
+    }
+  },
+  "overlays": {
+    "sev1": {
+      "meaning": "Extra obligations while a Sev 1 is open.",
+      "checklist": [
+        "Exec notice sent the day it was detected",
+        "Daily war-room update logged until RESOLVED",
+        "Triage record with three options within the profile's Sev 1 cadence",
+        "Management brief before CLOSED",
+        "Retrospective one-pager after CLOSED"
+      ]
+    }
+  },
+  "guards": {
+    "has_required_fields": "id, title, description, phase, owner, severity and detected date are all filled.",
+    "single_owner": "Exactly one named owner (no team names, no lists).",
+    "valid_severity": "Severity is one of the levels in the profile.",
+    "valid_phase": "Phase is a phase id in the profile.",
+    "decision_record_has_three_options": "decisions/DR-NNN.md exists and its Options table has rows A, B and C, each with schedule and cost filled.",
+    "decision_record_has_recommendation": "The record has a non-empty Recommendation line.",
+    "decision_chosen": "The record names the chosen option (A, B or C), who decided and when.",
+    "decision_signed_if_waive_or_defer": "If the choice is B or C, the record says Signed: yes.",
+    "option_is_fix_or_waive": "The chosen option is A (fix now) or B (waive with conditions).",
+    "verification_ref_present": "A verification reference is recorded (evidence for a fix, the waiver conditions for a waiver).",
+    "option_is_defer": "The chosen option is C (defer).",
+    "customer_acceptance_if_customer_visible": "If the record says Customer visible: yes, a customer acceptance reference is present.",
+    "brief_present_if_required": "If the severity is in brief_required_for, briefs/B-NNN.md exists with all five sections filled.",
+    "lesson_present": "A one-line lesson is recorded.",
+    "reason_present": "A reason is given and logged in the event note.",
+    "valid_probability": "Probability is a whole number in the profile's scale.",
+    "valid_impact": "Impact is a whole number in the profile's scale.",
+    "mitigation_present": "A mitigation plan is written.",
+    "acceptor_named": "A named approver accepted the risk (and a note is given for Critical and High).",
+    "linked_issue_exists": "linked_issue points to an existing issue in the issue register.",
+    "sizing_present": "Effort, cost delta, schedule delta and risk note are filled.",
+    "all_tier_approvers_signed": "Every approver the profile lists for the computed tier appears in approvers_signed.",
+    "decision_ref_present": "decision_ref points to an existing decision record.",
+    "budget_row_logged": "The cost delta is reflected in budget.csv (a forecast update dated on or after approval).",
+    "exit_criteria_listed": "The gate has at least one exit criterion in the profile.",
+    "all_criteria_met": "criteria_met covers every exit criterion.",
+    "no_blocking_open_issues": "No open issue has a severity listed in the gate's requires_no_open_severity.",
+    "waiver_for_each_unmet_criterion": "Every unmet criterion is covered by a waiver_refs decision record marked Signed: yes.",
+    "issue_logged_for_each_unmet_criterion": "An issue exists, with gate_found set to this gate, for each unmet criterion."
+  }
+}

@@ -1,0 +1,5 @@
+id,title,description,phase,owner,probability,impact,state,mitigation,next_review,last_scored,accepted_by,linked_issue
+R-001,Power-delivery margin is thin at peak load,Peak current estimate has little margin against the droop limit.,design,Jordan Patel,4,3,OCCURRED,Add on-die droop monitors; run PDN analysis at every floorplan drop.,2026-03-20,2026-03-06,,I-007
+R-002,Foundry mask slot slips one cycle,,tapeout,Sam Okafor,2,4,MITIGATING,Reserve a second slot; confirm the slot in writing at G5.,2026-07-03,2026-06-19,,
+R-003,Customer firmware lands late,,bringup,Avery Chen,3,3,MITIGATING,Agree an interim firmware drop date with the customer; weekly check.,2026-03-20,2026-03-06,,
+R-004,Single source for package substrate,,tapeout,Sam Okafor,2,2,ACCEPTED,,2026-07-01,2026-06-01,Riley Morgan,

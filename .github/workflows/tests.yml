@@ -1,0 +1,31 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Unit and consistency tests
+        run: python -m unittest discover -s tests
+      - name: Repository checkers
+        run: |
+          python tools/check_spec.py
+          python tools/check_content.py
+          python tools/gen_lifecycles.py --check
+          python tools/gen_templates.py --check
+      - name: Worked example reproduces
+        run: python examples/run_demo.py --check
+      - name: Privacy scanner self-test
+        # The real denylist is private and never in the repository; CI proves the scanner works.
+        run: python tools/privacy_scan.py selftest

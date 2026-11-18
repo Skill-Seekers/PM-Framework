@@ -1,0 +1,7 @@
+{
+  "name": "pm-framework",
+  "version": "0.1.0",
+  "description": "A guarded program-management workflow for technical programs: workspaces of plain CSV registers, issue, risk, change and gate lifecycles that refuse illegal moves, three-option triage, briefs and weekly reports, health metrics and a read-only HTML dashboard. Five skills drive it. Ships with a silicon profile and a software profile.",
+  "keywords": ["program-management", "tpm", "raid", "risk-register", "stage-gate", "dashboard", "lifecycle"],
+  "license": "MIT"
+}

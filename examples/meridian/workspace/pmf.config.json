@@ -1,0 +1,7 @@
+{
+  "program": "Meridian-1 AI Accelerator",
+  "profile": "profile.json",
+  "baseline_start": "2026-01-05",
+  "baseline_end": "2026-12-18",
+  "baseline_budget": "2400000"
+}
